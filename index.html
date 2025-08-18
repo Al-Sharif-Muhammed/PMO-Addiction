@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="Local-first, offline No-PMO streak tracker with levels, ranks, and daily heatmap. All data in your browser only." />
+    <title>No-PMO — Local Streaks, Levels, and Heatmap</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="title-area">
+        <h1 class="app-title">No‑PMO</h1>
+  <div id="rankBadge" class="rank-badge" aria-live="polite">Iron III</div>
+      </div>
+      <div class="header-actions">
+        <button id="exportBtn" class="btn" title="Export JSON">Export</button>
+        <button id="importBtn" class="btn" title="Import JSON">Import</button>
+        <input id="importFile" type="file" accept="application/json" hidden />
+        <button id="resetBtn" class="btn btn-danger" title="Reset all data">Reset</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card rank" aria-labelledby="rankHeading">
+        <div class="card-header">
+          <h2 id="rankHeading">Current Rank</h2>
+          <div class="muted small">Based on Porn streak</div>
+        </div>
+        <div class="rank-body">
+          <img id="rankImageLarge" class="rank-img-lg" src="ranks/IronIII.png" alt="Iron III" />
+          <div class="rank-labels">
+            <div id="rankLabel" class="rank-title">Iron III</div>
+            <div class="muted small">Next: <span id="nextRankAlt">Iron II</span></div>
+          </div>
+        </div>
+      </section>
+      <section class="card challenge" aria-labelledby="challengeHeading">
+        <div class="card-header">
+          <h2 id="challengeHeading">Challenge</h2>
+          <div class="level-info">
+            <span>Level <strong id="levelValue">0</strong></span>
+            <span class="sep">•</span>
+            <span>Next: <strong id="nextRank">Iron II</strong></span>
+          </div>
+        </div>
+
+        <div class="challenge-body">
+          <div class="ring" aria-label="Countdown to next level day">
+            <div class="ring-visual" id="ringVisual">
+              <div class="ring-center">
+                <div class="countdown" id="countdown">00:00:00</div>
+                <div class="subtext">to next rank</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="challenge-meta">
+            <div class="progress-row">
+              <div class="progress-bar" aria-hidden="true">
+                <div class="progress" id="progressBar" style="width:0%"></div>
+              </div>
+              <div class="progress-text" id="progressText">0% of day</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card streaks" aria-labelledby="streaksHeading">
+        <div class="card-header">
+          <h2 id="streaksHeading">Streaks</h2>
+        </div>
+        <div class="streaks-grid">
+          <div class="streak">
+            <div class="streak-head">
+              <h3>Porn</h3>
+              <span class="tag tag-red">Tracked</span>
+            </div>
+            <div class="streak-time" id="pornTimer">00:00:00:00</div>
+            <div class="streak-meta">
+              <div>Last reset: <span id="pornLastReset">—</span></div>
+              <div>Total relapses: <span id="pornRelapses">0</span></div>
+            </div>
+            <div class="streak-actions">
+              <button class="btn btn-red" id="logPorn">Log Porn Relapse</button>
+            </div>
+          </div>
+
+          <div class="streak">
+            <div class="streak-head">
+              <h3>Masturbation</h3>
+              <span class="tag tag-yellow">Tracked</span>
+            </div>
+            <div class="streak-time" id="mastTimer">00:00:00:00</div>
+            <div class="streak-meta">
+              <div>Last reset: <span id="mastLastReset">—</span></div>
+              <div>Total relapses: <span id="mastRelapses">0</span></div>
+            </div>
+            <div class="streak-actions">
+              <button class="btn btn-yellow" id="logMast">Log Masturbation Relapse</button>
+            </div>
+          </div>
+
+          <div class="streak both">
+            <div class="streak-head">
+              <h3>Relapse (Both)</h3>
+            </div>
+            <p class="muted">If both happened, log once here.</p>
+            <div class="streak-actions">
+              <button class="btn btn-orange" id="logBoth">Log Both</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card heatmap" aria-labelledby="heatmapHeading">
+        <div class="card-header">
+          <h2 id="heatmapHeading">Daily Heatmap</h2>
+          <div class="legend">
+            <span class="legend-item"><span class="dot dot-green"></span> Clean</span>
+            <span class="legend-item"><span class="dot dot-yellow"></span> Mast only</span>
+            <span class="legend-item"><span class="dot dot-red"></span> Porn</span>
+          </div>
+        </div>
+        <div id="heatmapGrid" class="heatmap-grid" role="grid" aria-label="Daily Heatmap"></div>
+        <p class="muted small">Tip: Click any day to edit status. Editing the heatmap doesn't change streak timers; use the relapse buttons above for accuracy.</p>
+      </section>
+    </main>
+
+    <!-- Edit Day Modal -->
+    <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">Edit Day</h3>
+          <button id="modalClose" class="icon-btn" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-row"><strong id="modalDate">YYYY-MM-DD</strong></div>
+          <div class="modal-row">
+            <label>
+              <input type="radio" name="dayStatus" value="green" />
+              Clean (Green)
+            </label>
+          </div>
+          <div class="modal-row">
+            <label>
+              <input type="radio" name="dayStatus" value="yellow" />
+              Masturbation Only (Yellow)
+            </label>
+          </div>
+          <div class="modal-row">
+            <label>
+              <input type="radio" name="dayStatus" value="red" />
+              Porn (Red)
+            </label>
+          </div>
+          <div class="modal-row">
+            <label>
+              <input type="radio" name="dayStatus" value="clear" />
+              Clear Status
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="modalSave" class="btn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+  </html>
