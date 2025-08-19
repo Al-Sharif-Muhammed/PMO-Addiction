@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6bb2ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Dark background circle -->
+  <circle cx="16" cy="16" r="15" fill="#13161a" stroke="#242a33" stroke-width="2"/>
+  
+  <!-- Shield shape representing protection/defense -->
+  <path d="M16 6 L10 9 L10 18 Q10 22 16 25 Q22 22 22 18 L22 9 Z" fill="url(#grad)" opacity="0.9"/>
+  
+  <!-- Inner shield detail -->
+  <path d="M16 8 L12 10.5 L12 17.5 Q12 20 16 22 Q20 20 20 17.5 L20 10.5 Z" fill="#0d0f12" opacity="0.8"/>
+  
+  <!-- Central "X" or prohibition symbol -->
+  <g stroke="#6bb2ff" stroke-width="2" stroke-linecap="round">
+    <line x1="13" y1="13" x2="19" y2="19"/>
+    <line x1="19" y1="13" x2="13" y2="19"/>
+  </g>
+</svg>
