@@ -15,6 +15,7 @@
   <div id="rankBadge" class="rank-badge" aria-live="polite">Iron III</div>
       </div>
       <div class="header-actions">
+        <button id="setStreakBtn" class="btn" title="Set manual streak start">Set Streak</button>
         <button id="exportBtn" class="btn" title="Export JSON">Export</button>
         <button id="importBtn" class="btn" title="Import JSON">Import</button>
         <input id="importFile" type="file" accept="application/json" hidden />
@@ -164,6 +165,36 @@
         </div>
         <div class="modal-footer">
           <button id="modalSave" class="btn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Set Streak Start Modal -->
+    <div id="streakModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="streakModalTitle">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="streakModalTitle">Set Manual Streak Start</h3>
+          <button id="streakModalClose" class="icon-btn" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-row">
+            <label for="pornStartDate">Porn streak start date:</label>
+            <input type="datetime-local" id="pornStartDate" />
+          </div>
+          <div class="modal-row">
+            <label for="mastStartDate">Masturbation streak start date:</label>
+            <input type="datetime-local" id="mastStartDate" />
+          </div>
+          <div class="modal-row">
+            <label>
+              <input type="checkbox" id="updateHeatmapStart" checked />
+              Update heatmap start day to porn streak date
+            </label>
+          </div>
+          <p class="muted small">Note: This will set the start times for your current streaks. Use this to backdate when you actually started your current streak.</p>
+        </div>
+        <div class="modal-footer">
+          <button id="streakModalSave" class="btn">Set Streak Dates</button>
         </div>
       </div>
     </div>

@@ -36,6 +36,7 @@
 
     heatmapGrid: $('#heatmapGrid'),
 
+    setStreakBtn: $('#setStreakBtn'),
     exportBtn: $('#exportBtn'),
     importBtn: $('#importBtn'),
     importFile: $('#importFile'),
@@ -45,6 +46,13 @@
     modalClose: $('#modalClose'),
     modalDate: $('#modalDate'),
   modalSave: $('#modalSave'),
+
+    streakModal: $('#streakModal'),
+    streakModalClose: $('#streakModalClose'),
+    streakModalSave: $('#streakModalSave'),
+    pornStartDate: $('#pornStartDate'),
+    mastStartDate: $('#mastStartDate'),
+    updateHeatmapStart: $('#updateHeatmapStart'),
   };
 
   // App state shape
@@ -130,6 +138,24 @@
   function fmtDateTime(ts) {
     const d = new Date(ts);
     return d.toLocaleString();
+  }
+
+  // Convert timestamp to datetime-local format (YYYY-MM-DDTHH:mm)
+  function toDateTimeLocal(ts) {
+    const d = new Date(ts);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const h = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${y}-${m}-${day}T${h}:${min}`;
+  }
+
+  // Convert datetime-local format back to timestamp
+  function fromDateTimeLocal(dtStr) {
+    if (!dtStr) return Date.now();
+    const d = new Date(dtStr);
+    return d.getTime();
   }
 
   // Rank mapping — 27-step progression using I/II/III divisions (Master+ lack III)
@@ -275,6 +301,36 @@
     modalCurrentISO = null;
   }
 
+  // Streak Modal
+  function openStreakModal() {
+    // Pre-populate with current streak start times
+    els.pornStartDate.value = toDateTimeLocal(state.porn.lastResetAt);
+    els.mastStartDate.value = toDateTimeLocal(state.mast.lastResetAt);
+    els.updateHeatmapStart.checked = true;
+    els.streakModal.setAttribute('aria-hidden', 'false');
+  }
+  function closeStreakModal() {
+    els.streakModal.setAttribute('aria-hidden', 'true');
+  }
+  function saveStreakDates() {
+    const pornStart = fromDateTimeLocal(els.pornStartDate.value);
+    const mastStart = fromDateTimeLocal(els.mastStartDate.value);
+    const updateHeatmap = els.updateHeatmapStart.checked;
+    
+    // Update state
+    state.porn.lastResetAt = pornStart;
+    state.mast.lastResetAt = mastStart;
+    
+    // Update heatmap start if requested
+    if (updateHeatmap) {
+      state.startDayISO = isoDayFromTs(pornStart);
+    }
+    
+    saveState(state);
+    renderAll();
+    closeStreakModal();
+  }
+
   // Relapse logging
   function logRelapse(kind) {
     const now = Date.now();
@@ -368,7 +424,7 @@
       els.rankImageLarge.alt = rank.label;
     }
 
-  els.countdown.textContent = fmtHMS(remain);
+  els.countdown.textContent = fmtDHMS(remain);
   els.progressBar.style.width = `${pct}%`;
   els.progressText.textContent = `${pct}% of rank`;
     els.ringVisual.style.setProperty('--pct', pct);
@@ -406,6 +462,7 @@
     els.logMast.addEventListener('click', () => logRelapse('mast'));
     els.logBoth.addEventListener('click', () => logRelapse('both'));
 
+    els.setStreakBtn.addEventListener('click', openStreakModal);
     els.exportBtn.addEventListener('click', exportData);
     els.importBtn.addEventListener('click', () => els.importFile.click());
     els.importFile.addEventListener('change', (e) => {
@@ -423,6 +480,10 @@
       if (modalCurrentISO) setHeatmapDay(modalCurrentISO, selected);
       closeModal();
     });
+
+    els.streakModalClose.addEventListener('click', closeStreakModal);
+    els.streakModal.addEventListener('click', (e) => { if (e.target === els.streakModal) closeStreakModal(); });
+    els.streakModalSave.addEventListener('click', saveStreakDates);
 
   // no test tools
   }
